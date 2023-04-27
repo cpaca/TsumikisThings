@@ -1,0 +1,11 @@
+
+Mods: {
+	TsumikisThings: {
+		Items: {
+			BasicSword: {
+				DisplayName: Basic Sword
+				Tooltip: This is a basic modded sword.
+			}
+		}
+	}
+}
