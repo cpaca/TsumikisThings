@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,15 +14,15 @@ namespace TsumikisThings
     internal class SuperModifier
     {
         private static Random rand = new();
-        private double damageBonus = 0; // Damage bonus, in percent.
+        private static readonly ILog logger = TsumikisThings.GetLogger();
+
+        public double damageBonus = 0; // Damage bonus, in percent.
 
         // Creates a blank SuperModifier.
         // To create a random SuperModifier, call SuperModifier.createRandom()
-        public SuperModifier() { }
-
-        public SuperModifier(TagCompound tag)
+        public SuperModifier()
         {
-            damageBonus = tag.GetAsDouble("damageBonus");
+            damageBonus = 0;
         }
 
         public override string ToString()
@@ -33,12 +34,18 @@ namespace TsumikisThings
 
         public TooltipLine GetTooltipLine(Mod mod)
         {
-            TsumikisThings.LogDebug("Logging TooltipLine...");
-            TsumikisThings.LogDebug(damageBonus);
             string text = "";
             // https://learn.microsoft.com/en-us/dotnet/api/system.double.tostring?view=net-8.0
-            TsumikisThings.LogDebug(text);
-            text += "+" + damageBonus.ToString("F2") + "% damage";
+            if(damageBonus != 0)
+            {
+                text += "+" + damageBonus.ToString("F2") + "% damage";
+            }
+
+            // No super mods.
+            if(text == "")
+            {
+                text = "No super mods.";
+            }
             TooltipLine ret = new(mod, "SuperModifier", text);
             return ret;
         }
@@ -50,18 +57,32 @@ namespace TsumikisThings
             return ret;
         }
 
-        public TagCompound ToTag()
-        {
-            TagCompound ret = new TagCompound();
-            ret["damageBonus"] = damageBonus;
-            return ret;
-        }
-
         public SuperModifier Clone()
         {
             SuperModifier clone = new SuperModifier();
             clone.damageBonus = damageBonus;
             return clone;
+        }
+
+        public TagCompound ToTag()
+        {
+            logger.Debug("SuperModifier attempting to construct TagCompound");
+            TagCompound ret = new()
+            {
+                {"damageBonus", damageBonus }
+            };
+            logger.Debug("SuperModifier ToTag Returning");
+            return ret;
+        }
+
+        public void SaveData(TagCompound tag)
+        {
+            tag.Add("superModDamageBonus", damageBonus);
+        }
+
+        public void LoadData(TagCompound tag)
+        {
+            damageBonus = tag.ContainsKey("superModDamageBonus") ? tag.GetAsDouble("superModDamageBonus") : 0;
         }
     }
 }

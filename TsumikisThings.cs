@@ -1,3 +1,5 @@
+using log4net;
+using log4net.Repository.Hierarchy;
 using Terraria.ModLoader;
 
 namespace TsumikisThings
@@ -12,6 +14,11 @@ namespace TsumikisThings
 		internal static TsumikisThings GetMod()
 		{
 			return ModContent.GetInstance<TsumikisThings>();
+		}
+
+		internal static ILog GetLogger()
+		{
+			return GetMod().Logger;
 		}
 	}
 }
