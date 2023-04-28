@@ -17,15 +17,60 @@ namespace TsumikisThings
         private static Random rand = new();
         private static readonly ILog logger = TsumikisThings.GetLogger();
 
-        public double damageBonus; // Damage bonus, in percent.
+        private double damageBonus; // Damage bonus
+        private double critChance; // Crit chance
+        private double moveSpeed; // Movement speed bonus
+        private double ammoConsumption; // Ammo consumption % chance reduction
+        private double weaponSize; // Weapon size % increase
 
+        private int defense; // Defense bonus, like the Warding mod
+        private int extraMana; // Mana bonus, like the Arcane mod
+        private double summonDamageHealChance; // Chance to heal when summon damage received
         
         /// <summary>
         /// All below functions (up to the next summary) are to make sure the modifiers work properly
         /// </summary>
-        public void UpdateAccessory(Player player)
+        public void UpdateAccessory(TsumikiPlayer modPlayer)
         {
-            player.GetDamage(DamageClass.Generic) += (float) damageBonus / 100.0f;
+            Player player = modPlayer.Player;
+            player.GetDamage(DamageClass.Generic) += (float) damageBonus;
+            player.GetCritChance(DamageClass.Generic) += (float)critChance;
+            player.moveSpeed += (float) (1 + moveSpeed);
+            // process ammoConsumption in CanConsumeAmmo
+            // process weaponSize in ModifyItemScale
+            player.statDefense += defense;
+            player.statManaMax2 += extraMana;
+            // summonDamageHealChance processed manually in OnHitAnything
+        }
+
+        public void OnHitAnything(TsumikiPlayer modPlayer)
+        {
+            Player player = modPlayer.Player;
+            if (player.HeldItem.DamageType == DamageClass.Summon)
+            {
+                // Check for Summon Damage Heal
+                double randNum = rand.NextDouble();
+                if (randNum < summonDamageHealChance)
+                {
+                    if (modPlayer.summonHealCooldown <= 0)
+                    {
+                        // not on cooldown
+                        modPlayer.summonHealCooldown = 120;
+                        float healAmount = 2.5f + player.GetDamage(DamageClass.Summon).Base;
+                        player.Heal((int)healAmount);
+                    }
+                }
+            }
+        }
+
+        public bool CanConsumeAmmo()
+        {
+            return rand.NextDouble() >= ammoConsumption;
+        }
+
+        public void ModifyItemScale(ref float scale)
+        {
+            scale *= (float) (1+weaponSize);
         }
 
         // Sets this SuperModifier to itself + the other SuperModifier.
@@ -33,6 +78,19 @@ namespace TsumikisThings
         public void Add(SuperModifier oth)
         {
             damageBonus += oth.damageBonus;
+            critChance += oth.critChance;
+            moveSpeed += oth.moveSpeed;
+            ammoConsumption += oth.ammoConsumption;
+            weaponSize += oth.weaponSize;
+            defense += oth.defense;
+            extraMana += oth.extraMana;
+            summonDamageHealChance += oth.summonDamageHealChance;
+            LimitModifiers();
+        }   
+
+        private void LimitModifiers()
+        {
+            // not limiting anything so I can make sure everything works
         }
 
         /// <summary>
@@ -42,13 +100,13 @@ namespace TsumikisThings
         public SuperModifier()
         {
             damageBonus = 0;
-        }
-
-        public override string ToString()
-        {
-            string ret = "";
-            ret += "damageBonus: " + damageBonus;
-            return ret;
+            critChance = 0;
+            moveSpeed = 0;
+            ammoConsumption = 0;
+            weaponSize = 0;
+            defense = 0;
+            extraMana = 0;
+            summonDamageHealChance = 0;
         }
 
         public TooltipLine GetTooltipLine(Mod mod)
@@ -57,11 +115,39 @@ namespace TsumikisThings
             // https://learn.microsoft.com/en-us/dotnet/api/system.double.tostring?view=net-8.0
             if(damageBonus != 0)
             {
-                text += "+" + damageBonus.ToString("F2") + "% damage";
+                text += "+" + damageBonus.ToString("F2") + "% damage\n";
+            }
+            if (critChance != 0)
+            {
+                text += "+" + critChance.ToString("F2") + "% crit chance\n";
+            }
+            if (moveSpeed != 0)
+            {
+                text += "+" + moveSpeed.ToString("F2") + "% move speed\n";
+            }
+            if (ammoConsumption != 0)
+            {
+                text += "-" + ammoConsumption.ToString("F2") + "% ammo consumption\n";
+            }
+            if (weaponSize != 0)
+            {
+                text += "+" + weaponSize.ToString("F2") + "% weapon size\n";
+            }
+            if (defense != 0)
+            {
+                text += "+" + defense + " defense\n";
+            }
+            if (extraMana != 0)
+            {
+                text += "+" + extraMana + " mana\n";
+            }
+            if (summonDamageHealChance != 0)
+            {
+                text += summonDamageHealChance.ToString("F2") + "% chance to heal on summon damage hit\n";
             }
 
             // No super mods.
-            if(text == "")
+            if (text == "")
             {
                 text = "No super mods.";
             }
@@ -72,14 +158,30 @@ namespace TsumikisThings
         public static SuperModifier createRandom()
         {
             SuperModifier ret = new();
-            ret.damageBonus = rand.NextDouble() * 300;
+            ret.damageBonus = rand.NextDouble() * 0.03;
+            ret.critChance = rand.NextDouble() * 3;
+            ret.moveSpeed = rand.NextDouble() * 0.05;
+            ret.ammoConsumption = rand.NextDouble() * 0.03;
+            ret.weaponSize = rand.NextDouble() * 0.03;
+            ret.defense = rand.Next(1, 4);
+            ret.extraMana = rand.Next(1,20);
+            ret.summonDamageHealChance = rand.NextDouble() * 5;
             return ret;
         }
 
         public SuperModifier Clone()
         {
-            SuperModifier clone = new SuperModifier();
-            clone.damageBonus = damageBonus;
+            SuperModifier clone = new()
+            {
+                damageBonus = damageBonus,
+                critChance = critChance,
+                moveSpeed = moveSpeed,
+                ammoConsumption = ammoConsumption,
+                weaponSize = weaponSize,
+                defense = defense,
+                extraMana = extraMana,
+                summonDamageHealChance = summonDamageHealChance
+            };
             return clone;
         }
 
@@ -87,7 +189,14 @@ namespace TsumikisThings
         {
             TagCompound ret = new()
             {
-                {"damageBonus", damageBonus }
+                {"damageBonus", damageBonus },
+                {"critChance", critChance},
+                {"moveSpeed", moveSpeed},
+                {"ammoConsumption", ammoConsumption },
+                {"weaponSize", weaponSize },
+                {"defense", defense },
+                {"extraMana", extraMana},
+                {"summonDamageHealChance", summonDamageHealChance }
             };
             return ret;
         }
@@ -96,6 +205,14 @@ namespace TsumikisThings
         public SuperModifier(TagCompound tag)
         {
             damageBonus = tag.ContainsKey("damageBonus") ? tag.GetAsDouble("damageBonus") : 0;
+            critChance = tag.ContainsKey("critChance") ? tag.GetAsDouble("critChance") : 0;
+            moveSpeed = tag.ContainsKey("moveSpeed") ? tag.GetAsDouble("moveSpeed") : 0;
+            ammoConsumption = tag.ContainsKey("ammoConsumption") ? tag.GetAsDouble("ammoConsumption") : 0;
+            weaponSize = tag.ContainsKey("weaponSize") ? tag.GetAsDouble("weaponSize") : 0;
+            defense = tag.ContainsKey("defense") ? tag.GetAsInt("defense") : 0;
+            extraMana = tag.ContainsKey("extraMana") ? tag.GetAsInt("extraMana") : 0;
+            summonDamageHealChance = tag.ContainsKey("summonDamageHealChance") ? tag.GetAsDouble("summonDamageHealChance") : 0;
+            LimitModifiers();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using IL.Terraria.Graphics;
 using log4net;
 using log4net.Repository.Hierarchy;
+using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,7 +72,7 @@ namespace TsumikisThings
          */
         public override void UpdateAccessory(Item item, Player player, bool hideVisual)
         {
-            player.GetModPlayer<TsumikiGlobalPlayer>().AddModifier(modifiers);
+            player.GetModPlayer<TsumikiPlayer>().AddModifier(modifiers);
         }
     }
 }
