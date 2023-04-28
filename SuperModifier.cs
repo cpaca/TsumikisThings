@@ -34,13 +34,15 @@ namespace TsumikisThings
         public void UpdateAccessory(TsumikiPlayer modPlayer)
         {
             Player player = modPlayer.Player;
-            player.GetDamage(DamageClass.Generic) += (float) damageBonus;
-            player.GetCritChance(DamageClass.Generic) += (float)critChance;
-            player.moveSpeed += (float) (1 + moveSpeed);
+            
+            // Limitted to seven times the modifier's max value
+            player.GetDamage(DamageClass.Generic) += (float) LimitModifier(damageBonus, 0.21);
+            player.GetCritChance(DamageClass.Generic) += (float) LimitModifier(critChance, 21.0);
+            player.moveSpeed += (float) (1 + LimitModifier(moveSpeed, 0.35));
             // process ammoConsumption in CanConsumeAmmo
             // process weaponSize in ModifyItemScale
-            player.statDefense += defense;
-            player.statManaMax2 += extraMana;
+            player.statDefense += LimitModifier(defense, 28);
+            player.statManaMax2 += LimitModifier(extraMana, 140);
             // summonDamageHealChance processed manually in OnHitAnything
         }
 
@@ -51,7 +53,8 @@ namespace TsumikisThings
             {
                 // Check for Summon Damage Heal
                 double randNum = rand.NextDouble();
-                if (randNum < summonDamageHealChance)
+                double adjHealChance = LimitModifier(summonDamageHealChance, 0.35);
+                if (randNum < adjHealChance)
                 {
                     if (modPlayer.summonHealCooldown <= 0)
                     {
@@ -66,12 +69,12 @@ namespace TsumikisThings
 
         public bool CanConsumeAmmo()
         {
-            return rand.NextDouble() >= ammoConsumption;
+            return rand.NextDouble() >= LimitModifier(ammoConsumption, 0.21);
         }
 
         public void ModifyItemScale(ref float scale)
         {
-            scale *= (float) (1+weaponSize);
+            scale *= (float) (1+LimitModifier(weaponSize, 0.21));
         }
 
         // Sets this SuperModifier to itself + the other SuperModifier.
@@ -86,12 +89,29 @@ namespace TsumikisThings
             defense += oth.defense;
             extraMana += oth.extraMana;
             summonDamageHealChance += oth.summonDamageHealChance;
-            LimitModifiers();
         }   
 
-        private void LimitModifiers()
+        private int LimitModifier(int modifier, int cap)
         {
-            // not limiting anything so I can make sure everything works
+            if(modifier < cap)
+            {
+                return modifier;
+            }
+            double ratio = ((double)modifier) / cap;
+            double adjRatio = Math.Sqrt(ratio); // note that sqrt(x) < x if x > 1
+            int adjMod = (int) adjRatio * cap;
+            return adjMod;
+        }
+
+        private double LimitModifier(double modifier, double cap) {
+            if(modifier < cap)
+            {
+                return modifier;
+            }
+            double ratio = modifier / cap;
+            double adjRatio = Math.Sqrt(ratio);
+            double adjMod = adjRatio * cap;
+            return adjMod;
         }
 
         /// <summary>
@@ -243,7 +263,6 @@ namespace TsumikisThings
             defense = tag.ContainsKey("defense") ? tag.GetAsInt("defense") : 0;
             extraMana = tag.ContainsKey("extraMana") ? tag.GetAsInt("extraMana") : 0;
             summonDamageHealChance = tag.ContainsKey("summonDamageHealChance") ? tag.GetAsDouble("summonDamageHealChance") : 0;
-            LimitModifiers();
         }
     }
 }
