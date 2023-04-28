@@ -18,13 +18,6 @@ namespace TsumikisThings
 
         public double damageBonus = 0; // Damage bonus, in percent.
 
-        // Creates a blank SuperModifier.
-        // To create a random SuperModifier, call SuperModifier.createRandom()
-        public SuperModifier()
-        {
-            damageBonus = 0;
-        }
-
         public override string ToString()
         {
             string ret = "";

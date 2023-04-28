@@ -14,16 +14,11 @@ namespace TsumikisThings
 {
     internal class TsumikiGlobalItem : GlobalItem
     {
-        private SuperModifier modifiers;
+        private SuperModifier modifiers = new();
 
         private static readonly ILog logger = TsumikisThings.GetLogger();
 
         public override bool InstancePerEntity => true;
-
-        public TsumikiGlobalItem()
-        {
-            modifiers = new();
-        }
 
         public override bool AppliesToEntity(Item entity, bool lateInstantiation)
         {
@@ -32,11 +27,9 @@ namespace TsumikisThings
 
         public override GlobalItem Clone(Item from, Item to)
         {
-            TsumikiGlobalItem fromGlobalItem = from.GetGlobalItem<TsumikiGlobalItem>();
-            TsumikiGlobalItem toGlobalItem = new();
-            // the ? is needed because something that's not an accessory won't have super mods
-            toGlobalItem.modifiers = fromGlobalItem.modifiers?.Clone();
-            return toGlobalItem;
+            TsumikiGlobalItem clone = (TsumikiGlobalItem)base.Clone(from, to);
+            clone.modifiers = modifiers.Clone();
+            return clone;
         }
 
         public override void OnCreate(Item item, ItemCreationContext context)
@@ -65,7 +58,10 @@ namespace TsumikisThings
         // I guess this is how to do it?
         public override void SaveData(Item item, TagCompound tag)
         {
-            // tag.Add("superModDamageBonus", modifiers.damageBonus);
+            logger.Debug("Modifiers: " + modifiers.ToString());
+            logger.Debug("damageBonus: " + modifiers.damageBonus);
+            tag["superModDamageBonus"] = modifiers.damageBonus;
+            logger.Debug("Done with SaveData");
         }
 
         public override void LoadData(Item item, TagCompound tag)
