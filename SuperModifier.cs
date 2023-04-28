@@ -16,7 +16,12 @@ namespace TsumikisThings
         private static Random rand = new();
         private static readonly ILog logger = TsumikisThings.GetLogger();
 
-        public double damageBonus = 0; // Damage bonus, in percent.
+        public double damageBonus; // Damage bonus, in percent.
+
+        public SuperModifier()
+        {
+            damageBonus = 0;
+        }
 
         public override string ToString()
         {
@@ -59,23 +64,17 @@ namespace TsumikisThings
 
         public TagCompound ToTag()
         {
-            logger.Debug("SuperModifier attempting to construct TagCompound");
             TagCompound ret = new()
             {
                 {"damageBonus", damageBonus }
             };
-            logger.Debug("SuperModifier ToTag Returning");
             return ret;
         }
 
-        public void SaveData(TagCompound tag)
+        // This is equivalent to "Load data from tag".
+        public SuperModifier(TagCompound tag)
         {
-            tag.Add("superModDamageBonus", damageBonus);
-        }
-
-        public void LoadData(TagCompound tag)
-        {
-            damageBonus = tag.ContainsKey("superModDamageBonus") ? tag.GetAsDouble("superModDamageBonus") : 0;
+            damageBonus = tag.ContainsKey("damageBonus") ? tag.GetAsDouble("damageBonus") : 0;
         }
     }
 }

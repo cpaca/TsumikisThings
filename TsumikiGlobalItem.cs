@@ -58,15 +58,12 @@ namespace TsumikisThings
         // I guess this is how to do it?
         public override void SaveData(Item item, TagCompound tag)
         {
-            logger.Debug("Modifiers: " + modifiers.ToString());
-            logger.Debug("damageBonus: " + modifiers.damageBonus);
-            tag["superModDamageBonus"] = modifiers.damageBonus;
-            logger.Debug("Done with SaveData");
+            tag["superMods"] = modifiers.ToTag();
         }
 
         public override void LoadData(Item item, TagCompound tag)
         {
-            modifiers.damageBonus = tag.ContainsKey("superModDamageBonus") ? tag.GetAsDouble("superModDamageBonus") : 0;
+            modifiers = new SuperModifier(tag.GetCompound("superMods"));
         }
     }
 }
