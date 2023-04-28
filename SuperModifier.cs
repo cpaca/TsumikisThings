@@ -28,6 +28,13 @@ namespace TsumikisThings
             player.GetDamage(DamageClass.Generic) += (float) damageBonus / 100.0f;
         }
 
+        // Sets this SuperModifier to itself + the other SuperModifier.
+        // This also has logic for capping the possible bonuses
+        public void Add(SuperModifier oth)
+        {
+            damageBonus += oth.damageBonus;
+        }
+
         /// <summary>
         /// All below functions are part of making the basic UI and save/load work properly
         /// </summary>

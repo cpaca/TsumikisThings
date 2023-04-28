@@ -71,8 +71,7 @@ namespace TsumikisThings
          */
         public override void UpdateAccessory(Item item, Player player, bool hideVisual)
         {
-            base.UpdateAccessory(item, player, hideVisual);
-            modifiers.UpdateAccessory(player);
+            player.GetModPlayer<TsumikiGlobalPlayer>().AddModifier(modifiers);
         }
     }
 }
