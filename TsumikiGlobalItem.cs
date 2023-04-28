@@ -65,5 +65,14 @@ namespace TsumikisThings
         {
             modifiers = new SuperModifier(tag.GetCompound("superMods"));
         }
+
+        /**
+         * Functions below are simply re-sent to member variables (ie SuperModifier)
+         */
+        public override void UpdateAccessory(Item item, Player player, bool hideVisual)
+        {
+            base.UpdateAccessory(item, player, hideVisual);
+            modifiers.UpdateAccessory(player);
+        }
     }
 }

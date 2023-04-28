@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -17,6 +18,19 @@ namespace TsumikisThings
         private static readonly ILog logger = TsumikisThings.GetLogger();
 
         public double damageBonus; // Damage bonus, in percent.
+
+        
+        /// <summary>
+        /// All below functions (up to the next summary) are to make sure the modifiers work properly
+        /// </summary>
+        public void UpdateAccessory(Player player)
+        {
+            player.GetDamage(DamageClass.Generic) += (float) damageBonus / 100.0f;
+        }
+
+        /// <summary>
+        /// All below functions are part of making the basic UI and save/load work properly
+        /// </summary>
 
         public SuperModifier()
         {
