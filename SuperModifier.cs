@@ -55,8 +55,8 @@ namespace TsumikisThings
                     if (modPlayer.summonHealCooldown <= 0)
                     {
                         // not on cooldown
-                        modPlayer.summonHealCooldown = 120;
-                        float healAmount = 2.5f + player.GetDamage(DamageClass.Summon).Base;
+                        modPlayer.summonHealCooldown = 60;
+                        float healAmount = 1.5f + player.GetDamage(DamageClass.Summon).ApplyTo(1);
                         player.Heal((int)healAmount);
                     }
                 }
@@ -115,7 +115,7 @@ namespace TsumikisThings
             // https://learn.microsoft.com/en-us/dotnet/api/system.double.tostring?view=net-8.0
             if(damageBonus != 0)
             {
-                text += "+" + damageBonus.ToString("F2") + "% damage\n";
+                text += "+" + (100.0*damageBonus).ToString("F2") + "% damage\n";
             }
             if (critChance != 0)
             {
@@ -123,15 +123,15 @@ namespace TsumikisThings
             }
             if (moveSpeed != 0)
             {
-                text += "+" + moveSpeed.ToString("F2") + "% move speed\n";
+                text += "+" + (100.0*moveSpeed).ToString("F2") + "% move speed\n";
             }
             if (ammoConsumption != 0)
             {
-                text += "-" + ammoConsumption.ToString("F2") + "% ammo consumption\n";
+                text += "-" + (100.0*ammoConsumption).ToString("F2") + "% ammo consumption\n";
             }
             if (weaponSize != 0)
             {
-                text += "+" + weaponSize.ToString("F2") + "% weapon size\n";
+                text += "+" + (100.0*weaponSize).ToString("F2") + "% weapon size\n";
             }
             if (defense != 0)
             {
@@ -143,7 +143,7 @@ namespace TsumikisThings
             }
             if (summonDamageHealChance != 0)
             {
-                text += summonDamageHealChance.ToString("F2") + "% chance to heal on summon damage hit\n";
+                text += (100.0*summonDamageHealChance).ToString("F2") + "% chance to heal on summon damage hit\n";
             }
 
             // No super mods.
@@ -165,7 +165,7 @@ namespace TsumikisThings
             ret.weaponSize = rand.NextDouble() * 0.03;
             ret.defense = rand.Next(1, 4);
             ret.extraMana = rand.Next(1, 20);
-            ret.summonDamageHealChance = rand.NextDouble() * 5;
+            ret.summonDamageHealChance = rand.NextDouble() * 0.05;
             return ret;
         }
 
