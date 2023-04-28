@@ -71,6 +71,13 @@ namespace TsumikisThings
         {
             base.PostReforge(item);
             modifiers = SuperModifier.createRandom();
+
+            // remember Reforge is only called on local player
+            int guaranteedMods = Main.LocalPlayer.GetModPlayer<TsumikiPlayer>().CountGuaranteedSuperMods();
+            for(int i = 0; i < guaranteedMods; i++)
+            {
+                modifiers.AddOneModifier();
+            }
         }
 
         /**
@@ -79,6 +86,25 @@ namespace TsumikisThings
         public override void UpdateAccessory(Item item, Player player, bool hideVisual)
         {
             player.GetModPlayer<TsumikiPlayer>().AddModifier(modifiers);
+        }
+
+        public override bool ReforgePrice(Item item, ref int reforgePrice, ref bool canApplyDiscount)
+        {
+            // according to TML discord Reforge is only called on the local player and not on the server or any other players
+            Player player = Main.LocalPlayer;
+            TsumikiPlayer modPlayer = player.GetModPlayer<TsumikiPlayer>();
+            double mult = modPlayer.CalcReforgeMult(canApplyDiscount);
+            double cost = mult * reforgePrice;
+            if(cost > int.MaxValue)
+            {
+                // hmm.
+                reforgePrice = int.MaxValue;
+            }
+            else
+            {
+                reforgePrice = (int) cost;
+            }
+            return true;
         }
     }
 }

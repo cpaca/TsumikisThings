@@ -159,39 +159,45 @@ namespace TsumikisThings
         public static SuperModifier createRandom()
         {
             SuperModifier ret = new();
-            while(rand.NextDouble() < 0.20)
+            while(rand.NextDouble() < 0.5)
             {
-                int choice = rand.Next(0,8);
-                switch (choice)
-                {
-                    case 0:
-                        ret.damageBonus += rand.NextDouble() * 0.03;
-                        break;
-                    case 1:
-                        ret.critChance += rand.NextDouble() * 3;
-                        break;
-                    case 2:
-                        ret.moveSpeed += rand.NextDouble() * 0.05;
-                        break;
-                    case 3:
-                        ret.ammoConsumption += rand.NextDouble() * 0.03;
-                        break;
-                    case 4:
-                        ret.weaponSize += rand.NextDouble() * 0.03;
-                        break;
-                    case 5:
-                        ret.defense += rand.Next(1, 4);
-                        break;
-                    case 6:
-                        ret.extraMana += rand.Next(1, 20);
-                        break;
-                    case 7:
-                    default: // Default shouldn't get called, but just in case.
-                        ret.summonDamageHealChance = rand.NextDouble() * 0.05;
-                        break;
-                }
+                ret.AddOneModifier();
             }
             return ret;
+        }
+
+        // Adds exactly one random modifier to this SuperModifier.
+        public void AddOneModifier()
+        {
+            int choice = rand.Next(0, 8);
+            switch (choice)
+            {
+                case 0:
+                    damageBonus += rand.NextDouble() * 0.03;
+                    break;
+                case 1:
+                    critChance += rand.NextDouble() * 3;
+                    break;
+                case 2:
+                    moveSpeed += rand.NextDouble() * 0.05;
+                    break;
+                case 3:
+                    ammoConsumption += rand.NextDouble() * 0.03;
+                    break;
+                case 4:
+                    weaponSize += rand.NextDouble() * 0.03;
+                    break;
+                case 5:
+                    defense += rand.Next(1, 4);
+                    break;
+                case 6:
+                    extraMana += rand.Next(1, 20);
+                    break;
+                case 7:
+                default: // Default shouldn't get called, but just in case.
+                    summonDamageHealChance = rand.NextDouble() * 0.05;
+                    break;
+            }
         }
 
         public SuperModifier Clone()

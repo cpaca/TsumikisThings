@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
+using TsumikisThings.Items;
 
 namespace TsumikisThings
 {
@@ -56,6 +57,44 @@ namespace TsumikisThings
         public void AddModifier(SuperModifier modifier)
         {
             modifiers.Add(modifier);
+        }
+
+        // For counting the number of GuaranteedSuperMods
+        // since I'm not sure when UpdateInventory is called and/or reset
+        internal int CountGuaranteedSuperMods()
+        {
+            Item[] inv = Player.inventory;
+            int numSuperMods = 0;
+            foreach(Item item in inv)
+            {
+                ModItem modItem = item.ModItem;
+                if(modItem == null)
+                {
+                    continue;
+                }
+                if(modItem is GuaranteedSuperMods)
+                {
+                    // this item is a guarnteedSuperMods:
+                    numSuperMods += item.stack;
+                    // hard cap at 8
+                    if(numSuperMods > 8)
+                    {
+                        return 8;
+                    }
+                }
+            }
+            return numSuperMods;
+        }
+
+        internal double CalcReforgeMult(bool applyDiscount)
+        {
+            // 2.5x since 50% (1/2) chance of super mod
+            int numSuperMods = CountGuaranteedSuperMods();
+            if (applyDiscount)
+            {
+                return Math.Pow(2, numSuperMods);
+            }
+            return Math.Pow(2.5, numSuperMods);
         }
     }
 }
