@@ -67,6 +67,12 @@ namespace TsumikisThings
             modifiers = new SuperModifier(tag.GetCompound("superMods"));
         }
 
+        public override void PostReforge(Item item)
+        {
+            base.PostReforge(item);
+            modifiers = SuperModifier.createRandom();
+        }
+
         /**
          * Functions below are simply re-sent to member variables (ie SuperModifier)
          */

@@ -164,7 +164,7 @@ namespace TsumikisThings
             ret.ammoConsumption = rand.NextDouble() * 0.03;
             ret.weaponSize = rand.NextDouble() * 0.03;
             ret.defense = rand.Next(1, 4);
-            ret.extraMana = rand.Next(1,20);
+            ret.extraMana = rand.Next(1, 20);
             ret.summonDamageHealChance = rand.NextDouble() * 5;
             return ret;
         }
