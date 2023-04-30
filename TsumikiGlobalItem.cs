@@ -4,6 +4,7 @@ using log4net.Repository.Hierarchy;
 using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -105,6 +106,20 @@ namespace TsumikisThings
                 reforgePrice = (int) cost;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Networking commands.
+        /// </summary>
+
+        public override void NetSend(Item item, BinaryWriter writer)
+        {
+            modifiers.NetSend(item, writer);
+        }
+
+        public override void NetReceive(Item item, BinaryReader reader)
+        {
+            modifiers.NetReceive(item, reader);
         }
     }
 }

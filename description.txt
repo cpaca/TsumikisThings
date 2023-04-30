@@ -1,1 +1,6 @@
-Tsumiki's Things is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+Tsumiki's Things is a mod that does things that Tsumiki wants.
+
+Current features:
+Super-modifiers. When you reforge at tinkerer, you have a chance of getting at least one extra effect. 
+Super-modifiers get weaker at seven times the cap (so having more than 21% extra damage from super mods wouldn't be as effective.)
+It never *stops* being effective, though.

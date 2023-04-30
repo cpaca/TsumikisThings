@@ -2,6 +2,7 @@
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace TsumikisThings
             // Limitted to seven times the modifier's max value
             player.GetDamage(DamageClass.Generic) += (float) LimitModifier(damageBonus, 0.21);
             player.GetCritChance(DamageClass.Generic) += (float) LimitModifier(critChance, 21.0);
-            player.moveSpeed += (float) (1 + LimitModifier(moveSpeed, 0.35));
+            player.moveSpeed += (float) (LimitModifier(moveSpeed, 0.35));
             // process ammoConsumption in CanConsumeAmmo
             // process weaponSize in ModifyItemScale
             player.statDefense += LimitModifier(defense, 28);
@@ -263,6 +264,41 @@ namespace TsumikisThings
             defense = tag.ContainsKey("defense") ? tag.GetAsInt("defense") : 0;
             extraMana = tag.ContainsKey("extraMana") ? tag.GetAsInt("extraMana") : 0;
             summonDamageHealChance = tag.ContainsKey("summonDamageHealChance") ? tag.GetAsDouble("summonDamageHealChance") : 0;
+        }
+
+        /// <summary>
+        /// Network commands.
+        /// </summary>
+        public void NetSend(Item item, BinaryWriter writer)
+        {
+            if (item.accessory)
+            {
+                writer.Write(damageBonus);
+                writer.Write(critChance);
+                writer.Write(moveSpeed);
+                writer.Write(ammoConsumption);
+                writer.Write(weaponSize);
+                writer.Write(defense);
+                writer.Write(extraMana);
+                writer.Write(summonDamageHealChance);
+            }
+            // otherwise do nothing
+        }
+
+        public void NetReceive(Item item, BinaryReader reader)
+        {
+            if (item.accessory)
+            {
+                damageBonus = reader.ReadDouble();
+                critChance = reader.ReadDouble();
+                moveSpeed = reader.ReadDouble();
+                ammoConsumption = reader.ReadDouble();
+                weaponSize = reader.ReadDouble();
+                defense = reader.ReadInt32();
+                extraMana = reader.ReadInt32();
+                summonDamageHealChance = reader.ReadDouble();
+            }
+            // otherwise not an accessory so doesn't apply
         }
     }
 }
