@@ -13,6 +13,7 @@ namespace TsumikisThings
     {
         SuperModifier modifiers = new();
         internal int summonHealCooldown = 0;
+        double fractionalHealth = 0;
 
         public override void ResetEffects()
         {
@@ -95,6 +96,22 @@ namespace TsumikisThings
                 return Math.Pow(2, numSuperMods);
             }
             return Math.Pow(2.5, numSuperMods);
+        }
+
+        /// <summary>
+        /// This differs from player.Heal() in that it accepts non-integer values and will, over time,
+        /// add them together
+        /// </summary>
+        /// <param name="val"></param>
+        public void Heal(double val)
+        {
+            fractionalHealth += val;
+            int numToHeal = (int)fractionalHealth;
+            if (numToHeal > 0)
+            {
+                Player.Heal(numToHeal);
+                fractionalHealth -= numToHeal;
+            }
         }
     }
 }

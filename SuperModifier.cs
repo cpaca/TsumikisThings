@@ -1,5 +1,6 @@
 ﻿using IL.Terraria.GameContent.ObjectInteractions;
 using log4net;
+using log4net.Repository.Hierarchy;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +28,7 @@ namespace TsumikisThings
 
         private int defense; // Defense bonus, like the Warding mod
         private int extraMana; // Mana bonus, like the Arcane mod
-        private double summonDamageHealChance; // Chance to heal when summon damage received
+        private double summonDamageHealAmount; // Chance to heal when summon damage received
         
         /// <summary>
         /// All below functions (up to the next summary) are to make sure the modifiers work properly
@@ -54,15 +55,18 @@ namespace TsumikisThings
             {
                 // Check for Summon Damage Heal
                 double randNum = rand.NextDouble();
-                double adjHealChance = LimitModifier(summonDamageHealChance, 0.35);
-                if (randNum < adjHealChance)
+                StatModifier damageClass = modPlayer.Player.GetDamage(DamageClass.Summon);
+                // from here we just hope the flat damage values are negligible
+                double healChance = (damageClass.ApplyTo(1) - damageClass.Flat)/100;
+                logger.Debug("Heal chance to beat: " + healChance);
+                if (randNum < healChance)
                 {
                     if (modPlayer.summonHealCooldown <= 0)
                     {
                         // not on cooldown
-                        modPlayer.summonHealCooldown = 60;
-                        float healAmount = 1.5f + player.GetDamage(DamageClass.Summon).ApplyTo(1);
-                        player.Heal((int)healAmount);
+                        modPlayer.summonHealCooldown = 120;
+                        double healAmount = LimitModifier(summonDamageHealAmount, 7.0);
+                        modPlayer.Heal(healAmount);
                     }
                 }
             }
@@ -89,7 +93,7 @@ namespace TsumikisThings
             weaponSize += oth.weaponSize;
             defense += oth.defense;
             extraMana += oth.extraMana;
-            summonDamageHealChance += oth.summonDamageHealChance;
+            summonDamageHealAmount += oth.summonDamageHealAmount;
         }   
 
         private int LimitModifier(int modifier, int cap)
@@ -128,7 +132,7 @@ namespace TsumikisThings
             weaponSize = 0;
             defense = 0;
             extraMana = 0;
-            summonDamageHealChance = 0;
+            summonDamageHealAmount = 0;
         }
 
         public TooltipLine GetTooltipLine(Mod mod)
@@ -163,9 +167,9 @@ namespace TsumikisThings
             {
                 text += "+" + extraMana + " mana\n";
             }
-            if (summonDamageHealChance != 0)
+            if (summonDamageHealAmount != 0)
             {
-                text += (100.0*summonDamageHealChance).ToString("F2") + "% chance to heal on summon damage hit\n";
+                text += "Chance to heal " + (1.0*summonDamageHealAmount).ToString("F2") + " on hit while holding a summon weapon\n";
             }
 
             // No super mods.
@@ -216,7 +220,7 @@ namespace TsumikisThings
                     break;
                 case 7:
                 default: // Default shouldn't get called, but just in case.
-                    summonDamageHealChance = rand.NextDouble() * 0.05;
+                    summonDamageHealAmount = rand.NextDouble() * 1.0;
                     break;
             }
         }
@@ -232,7 +236,7 @@ namespace TsumikisThings
                 weaponSize = weaponSize,
                 defense = defense,
                 extraMana = extraMana,
-                summonDamageHealChance = summonDamageHealChance
+                summonDamageHealAmount = summonDamageHealAmount
             };
             return clone;
         }
@@ -248,7 +252,7 @@ namespace TsumikisThings
                 {"weaponSize", weaponSize },
                 {"defense", defense },
                 {"extraMana", extraMana},
-                {"summonDamageHealChance", summonDamageHealChance }
+                {"summonDamageHealAmount", summonDamageHealAmount }
             };
             return ret;
         }
@@ -263,7 +267,7 @@ namespace TsumikisThings
             weaponSize = tag.ContainsKey("weaponSize") ? tag.GetAsDouble("weaponSize") : 0;
             defense = tag.ContainsKey("defense") ? tag.GetAsInt("defense") : 0;
             extraMana = tag.ContainsKey("extraMana") ? tag.GetAsInt("extraMana") : 0;
-            summonDamageHealChance = tag.ContainsKey("summonDamageHealChance") ? tag.GetAsDouble("summonDamageHealChance") : 0;
+            summonDamageHealAmount = tag.ContainsKey("summonDamageHealAmount") ? tag.GetAsDouble("summonDamageHealAmount") : 0;
         }
 
         /// <summary>
@@ -280,7 +284,7 @@ namespace TsumikisThings
                 writer.Write(weaponSize);
                 writer.Write(defense);
                 writer.Write(extraMana);
-                writer.Write(summonDamageHealChance);
+                writer.Write(summonDamageHealAmount);
             }
             // otherwise do nothing
         }
@@ -296,7 +300,7 @@ namespace TsumikisThings
                 weaponSize = reader.ReadDouble();
                 defense = reader.ReadInt32();
                 extraMana = reader.ReadInt32();
-                summonDamageHealChance = reader.ReadDouble();
+                summonDamageHealAmount = reader.ReadDouble();
             }
             // otherwise not an accessory so doesn't apply
         }
