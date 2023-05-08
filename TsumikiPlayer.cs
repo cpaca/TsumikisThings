@@ -87,15 +87,24 @@ namespace TsumikisThings
             return numSuperMods;
         }
 
-        internal double CalcReforgeMult(bool applyDiscount)
+        internal double CalcReforgeMult()
         {
             // 2.5x since 50% (1/2) chance of super mod
             int numSuperMods = CountGuaranteedSuperMods();
-            if (applyDiscount)
+            bool discountCard = Player.discount;
+            // TsumikisThings.GetLogger().Debug("ApplyDiscount state: " + discountCard);
+            // Did it this way so I could log things more easily.
+            double ret;
+            if (discountCard)
             {
-                return Math.Pow(2, numSuperMods);
+                ret = Math.Pow(1.75, (double) numSuperMods);
             }
-            return Math.Pow(2.5, numSuperMods);
+            else
+            {
+                ret = Math.Pow(2.0, (double) numSuperMods);
+            }
+            // TsumikisThings.GetLogger().Debug("Ret: " + ret);
+            return ret;
         }
 
         /// <summary>

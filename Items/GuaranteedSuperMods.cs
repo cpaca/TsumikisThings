@@ -14,7 +14,8 @@ namespace TsumikisThings.Items
         public override void SetStaticDefaults()
         {
             Tooltip.SetDefault("Every copy of this item in your inventory guarantees a super-mod on reforge.\n" +
-                "However, this also makes reforging 5x more expensive for accessories.\n" +
+                "However, this also makes reforging 2x more expensive for accessories, per guaranteed super mod.\n" +
+                "Cost scaling is 1.75x with discount card.\n" +
                 "Maximum 8 can be used at once.");
         }
 

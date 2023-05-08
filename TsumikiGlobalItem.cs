@@ -94,7 +94,7 @@ namespace TsumikisThings
             // according to TML discord Reforge is only called on the local player and not on the server or any other players
             Player player = Main.LocalPlayer;
             TsumikiPlayer modPlayer = player.GetModPlayer<TsumikiPlayer>();
-            double mult = modPlayer.CalcReforgeMult(canApplyDiscount);
+            double mult = modPlayer.CalcReforgeMult();
             double cost = mult * reforgePrice;
             if(cost > int.MaxValue)
             {

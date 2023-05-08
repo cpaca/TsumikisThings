@@ -1,3 +1,3 @@
 displayName = Tsumiki's Things
 author = Tsumiki Miniwa
-version = 1.0.3
+version = 1.0.4
