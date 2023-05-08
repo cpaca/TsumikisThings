@@ -57,15 +57,25 @@ namespace TsumikisThings
                 double randNum = rand.NextDouble();
                 StatModifier damageClass = modPlayer.Player.GetDamage(DamageClass.Summon);
                 // from here we just hope the flat damage values are negligible
-                double healChance = (damageClass.ApplyTo(1) - damageClass.Flat)/100;
-                logger.Debug("Heal chance to beat: " + healChance);
-                if (randNum < healChance)
+
+                // 1.00 with no buffs
+                double healChance = (damageClass.ApplyTo(1) - damageClass.Flat);
+
+                // 1.00 with no buffs, buffs are double strength
+                healChance *= healChance;
+                
+                // 1.00 with no buffs, buffs are double strength.
+                healChance /= 100;
+
+                if (modPlayer.summonHealCooldown <= 0)
                 {
-                    if (modPlayer.summonHealCooldown <= 0)
+                    logger.Debug("Heal chance to beat: " + healChance);
+                    if (randNum < healChance)
                     {
                         // not on cooldown
-                        modPlayer.summonHealCooldown = 120;
+                        modPlayer.summonHealCooldown = 60;
                         double healAmount = LimitModifier(summonDamageHealAmount, 7.0);
+                        logger.Debug("Healing for " + healAmount);
                         modPlayer.Heal(healAmount);
                     }
                 }
