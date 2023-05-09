@@ -230,7 +230,7 @@ namespace TsumikisThings
                     break;
                 case 7:
                 default: // Default shouldn't get called, but just in case.
-                    summonDamageHealAmount = rand.NextDouble() * 1.0;
+                    summonDamageHealAmount += rand.NextDouble() * 1.0;
                     break;
             }
         }
