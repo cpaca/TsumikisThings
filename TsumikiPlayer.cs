@@ -39,9 +39,17 @@ namespace TsumikisThings
             modifiers.UpdateAccessory(this);
         }
 
+        // melee hits
         public override void OnHitNPC(Item item, NPC target, int damage, float knockback, bool crit)
         {
             base.OnHitNPC(item, target, damage, knockback, crit);
+            modifiers.OnHitNPC(this);
+        }
+
+        // projectile hits
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, int damage, float knockback, bool crit)
+        {
+            base.OnHitNPCWithProj(proj, target, damage, knockback, crit);
             modifiers.OnHitNPC(this);
         }
 
