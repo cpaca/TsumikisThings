@@ -39,10 +39,10 @@ namespace TsumikisThings
             modifiers.UpdateAccessory(this);
         }
 
-        public override void OnHitAnything(float x, float y, Entity victim)
+        public override void OnHitNPC(Item item, NPC target, int damage, float knockback, bool crit)
         {
-            base.OnHitAnything(x, y, victim);
-            modifiers.OnHitAnything(this);
+            base.OnHitNPC(item, target, damage, knockback, crit);
+            modifiers.OnHitNPC(this);
         }
 
         public override bool CanConsumeAmmo(Item weapon, Item ammo)

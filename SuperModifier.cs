@@ -45,10 +45,10 @@ namespace TsumikisThings
             // process weaponSize in ModifyItemScale
             player.statDefense += LimitModifier(defense, 28);
             player.statManaMax2 += LimitModifier(extraMana, 140);
-            // summonDamageHealChance processed manually in OnHitAnything
+            // summonDamageHealChance processed manually in OnHitNPC
         }
 
-        public void OnHitAnything(TsumikiPlayer modPlayer)
+        public void OnHitNPC(TsumikiPlayer modPlayer)
         {
             Player player = modPlayer.Player;
             if (player.HeldItem.DamageType == DamageClass.Summon)
